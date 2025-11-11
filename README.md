@@ -1,8 +1,7 @@
 # 机票预订系统
+[项目来源-机票预定系统](https://github.com/Shuai-Xie/flight-ticket-booksystem?tab=readme-ov-file)
 
-[详细介绍 - 数据库课程设计 - 机票预订系统 - 简书](http://www.jianshu.com/p/60a392df9f03)
-
-注册和登录界面都学习这位仁兄的 [buckyroberts-Viberr](https://github.com/buckyroberts/Viberr)
+本项目是在原项目的基础上的改进和优化。
 
 登录账号
 
