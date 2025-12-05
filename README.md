@@ -1,5 +1,7 @@
 1.下载好代码后确认自己的python版本和postgreSQL版本，选择一个兼容的Django版本pip
+
 2.然后在air_ticket_system/settings.py里面修改如下信息，确保和你的本地创建的数据库一样
+```
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -10,7 +12,11 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+```
+
 3.在虚拟环境中执行python manage.py migrate
+
 4.可以执行python manage.py createsuperuser来创建管理员账户
+
 5.python manage.py runserver用于启动
 
