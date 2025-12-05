@@ -1,0 +1,4 @@
+/* 预留自定义样式，方便后续换 UI 框架 */
+body {
+    padding-bottom: 40px;
+}

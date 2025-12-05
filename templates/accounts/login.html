@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}用户登录{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <!-- 宽度从 col-md-6 改为 col-md-4，让整体更小 -->
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header py-2">
+                用户登录
+            </div>
+            <!-- 减少内边距 p-3，整体更紧凑 -->
+            <div class="card-body p-3">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger py-2 mb-2">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- 用户名 -->
+                    <div class="row mb-2 align-items-center">
+                        <label class="col-sm-4 col-form-label text-start py-0">
+                            用户名：
+                        </label>
+                        <div class="col-sm-8">
+                            {{ form.username }}
+                        </div>
+                    </div>
+
+                    <!-- 密码（“密 码”中间加空格对齐） -->
+                    <div class="row mb-2 align-items-center">
+                        <label class="col-sm-4 col-form-label text-start py-0">
+                            密&nbsp;码：
+                        </label>
+                        <div class="col-sm-8">
+                            {{ form.password }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <!-- 去掉 btn-lg，保持普通高度 -->
+                        <button type="submit" class="btn btn-primary">
+                            登录
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

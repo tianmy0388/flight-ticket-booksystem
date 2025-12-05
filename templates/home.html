@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}航班查询 - 机票预订系统{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                航班查询
+            </div>
+            <div class="card-body">
+                <form method="get" action="{% url 'flights:search' %}">
+                    <div class="mb-3">
+                        <label class="form-label">出发城市</label>
+                        {{ form.depart_city }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">到达城市</label>
+                        {{ form.arrive_city }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">出发日期</label>
+                        {{ form.depart_date }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">排序方式</label>
+                        {{ form.sort }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">查询航班</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

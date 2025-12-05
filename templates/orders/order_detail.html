@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}订单详情{% endblock %}
+{% block content %}
+<h3>订单详情</h3>
+<div class="card mb-3">
+    <div class="card-body">
+        <p>订单号：{{ order.order_no }}</p>
+        <p>乘机人：{{ order.profile.real_name }} / {{ order.profile.id_card_no }}</p>
+        <p>航班：{{ order.flight.flight_no }} - {{ order.flight.airline }}</p>
+        <p>起飞时间：{{ order.flight.depart_time|date:"Y-m-d H:i" }}</p>
+        <p>舱位：{{ order.seat.get_cabin_class_display }}</p>
+        <p>票价：¥{{ order.ticket_price }}，税费：¥{{ order.tax }}，手续费：¥{{ order.fee }}</p>
+        <p>总金额：¥{{ order.total_amount }}</p>
+        <p>状态：{{ order.get_status_display }}</p>
+    </div>
+</div>
+
+{% if order.status == "PAID" %}
+    <a href="{% url 'orders:refund_request' order.order_no %}"
+       class="btn btn-danger">申请退票</a>
+{% endif %}
+{% endblock %}

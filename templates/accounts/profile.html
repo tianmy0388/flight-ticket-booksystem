@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}个人信息{% endblock %}
+{% block content %}
+<h3>个人信息</h3>
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

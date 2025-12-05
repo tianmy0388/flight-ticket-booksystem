@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}航班详情 - {{ flight.flight_no }}{% endblock %}
+{% block content %}
+<h3>航班详情</h3>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">{{ flight.flight_no }} - {{ flight.airline }}</h5>
+        <p>机型：{{ flight.plane_type }}</p>
+        <p>
+            起飞：{{ flight.depart_airport.city }} {{ flight.depart_airport.name }}
+            ({{ flight.depart_airport.code }})<br>
+            时间：{{ flight.depart_time|date:"Y-m-d H:i" }}
+        </p>
+        <p>
+            到达：{{ flight.arrive_airport.city }} {{ flight.arrive_airport.name }}
+            ({{ flight.arrive_airport.code }})<br>
+            时间：{{ flight.arrive_time|date:"Y-m-d H:i" }}
+        </p>
+    </div>
+</div>
+
+<h4>舱位与价格</h4>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>舱位</th>
+        <th>价格</th>
+        <th>余票</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for s in seats %}
+        <tr>
+            <td>{{ s.get_cabin_class_display }}</td>
+            <td>¥{{ s.price }}</td>
+            <td>{{ s.available_seats }}</td>
+            <td>
+                {% if user.is_authenticated and s.available_seats > 0 %}
+                    <a href="{% url 'orders:create_order' flight.id s.id %}"
+                       class="btn btn-sm btn-primary">预订</a>
+                {% elif s.available_seats <= 0 %}
+                    <span class="text-muted">已售罄</span>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}?next={{ request.path }}">登录后预订</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

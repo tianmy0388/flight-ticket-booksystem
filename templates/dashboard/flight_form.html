@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{% if is_create %}新增航班{% else %}编辑航班{% endif %}{% endblock %}
+{% block content %}
+<h3>{% if is_create %}新增航班{% else %}编辑航班{% endif %}</h3>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            {{ form.flight_no.label_tag }} {{ form.flight_no }}
+        </div>
+        <div class="col-md-6">
+            {{ form.airline.label_tag }} {{ form.airline }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            {{ form.plane_type.label_tag }} {{ form.plane_type }}
+        </div>
+        <div class="col-md-6">
+            {{ form.base_price.label_tag }} {{ form.base_price }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            {{ form.depart_airport.label_tag }} {{ form.depart_airport }}
+        </div>
+        <div class="col-md-6">
+            {{ form.arrive_airport.label_tag }} {{ form.arrive_airport }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            {{ form.depart_time.label_tag }} {{ form.depart_time }}
+        </div>
+        <div class="col-md-6">
+            {{ form.arrive_time.label_tag }} {{ form.arrive_time }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            {{ form.status.label_tag }} {{ form.status }}
+        </div>
+    </div>
+
+    <h5 class="mt-3 mb-2">各舱位座位数</h5>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            {{ form.economy_seats.label_tag }} {{ form.economy_seats }}
+        </div>
+        <div class="col-md-4">
+            {{ form.business_seats.label_tag }} {{ form.business_seats }}
+        </div>
+        <div class="col-md-4">
+            {{ form.first_seats.label_tag }} {{ form.first_seats }}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        {% if is_create %}创建{% else %}保存{% endif %}
+    </button>
+    <a href="{% url 'dashboard:flight_list' %}" class="btn btn-secondary">返回列表</a>
+</form>
+{% endblock %}

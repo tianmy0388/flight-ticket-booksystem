@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}确认订单{% endblock %}
+{% block content %}
+<h3>确认订单</h3>
+<div class="card mb-3">
+    <div class="card-body">
+        <p>乘机人：{{ profile.real_name }} ({{ profile.id_card_no }})</p>
+        <p>航班：{{ flight.flight_no }} - {{ flight.airline }}</p>
+        <p>起飞时间：{{ flight.depart_time|date:"Y-m-d H:i" }}</p>
+        <p>舱位：{{ seat.get_cabin_class_display }}</p>
+        <p>票价：¥{{ seat.price }}</p>
+    </div>
+</div>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">提交订单（视为已支付）</button>
+</form>
+{% endblock %}

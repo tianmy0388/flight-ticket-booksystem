@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}订单错误{% endblock %}
+{% block content %}
+<div class="alert alert-danger">
+    {{ message }}
+</div>
+<a href="{% url 'home' %}" class="btn btn-primary">返回首页</a>
+{% endblock %}

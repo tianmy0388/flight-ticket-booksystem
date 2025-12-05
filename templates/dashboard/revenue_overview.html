@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}营收统计{% endblock %}
+
+{% block content %}
+<h3>营收统计</h3>
+
+<!-- 按年统计 -->
+<h4 class="mt-4">按年统计</h4>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <label class="form-label" for="id_year">年份</label>
+        <input type="number"
+               class="form-control"
+               id="id_year"
+               name="year"
+               value="{{ selected_year }}">
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">查询</button>
+    </div>
+</form>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-2">
+        <div class="border rounded p-2 bg-light text-start">
+            <strong>年份：</strong>{{ selected_year }}
+        </div>
+    </div>
+    <div class="col-md-6 mb-2">
+        <div class="border rounded p-2 bg-light text-start">
+            <strong>营收：</strong>¥{{ yearly_total|default:"0.00" }}
+        </div>
+    </div>
+</div>
+
+<!-- 按月统计 -->
+<h4 class="mt-4">按月统计</h4>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <label class="form-label" for="id_month">月份</label>
+        <input type="month"
+               class="form-control"
+               id="id_month"
+               name="month"
+               value="{{ selected_month }}">
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">查询</button>
+    </div>
+</form>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-2">
+        <div class="border rounded p-2 bg-light text-start">
+            <strong>月份：</strong>{{ selected_month }}
+        </div>
+    </div>
+    <div class="col-md-6 mb-2">
+        <div class="border rounded p-2 bg-light text-start">
+            <strong>营收：</strong>¥{{ monthly_total|default:"0.00" }}
+        </div>
+    </div>
+</div>
+
+<!-- 按周统计 -->
+<h4 class="mt-4">按周统计</h4>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <label class="form-label" for="id_week_start">周起始日期</label>
+        <input type="date"
+               class="form-control"
+               id="id_week_start"
+               name="week_start"
+               value="{{ selected_week_start }}">
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">查询</button>
+    </div>
+</form>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-2">
+        <div class="border rounded p-2 bg-light text-start">
+            <strong>周（起始日期 - 结束日期）：</strong>
+            {{ selected_week_start }} ~ {{ week_end|date:"Y-%m-%d" }}
+        </div>
+    </div>
+    <div class="col-md-6 mb-2">
+        <div class="border rounded p-2 bg-light text-start">
+            <strong>营收：</strong>¥{{ weekly_total|default:"0.00" }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

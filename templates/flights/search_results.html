@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}搜索结果 - 机票预订系统{% endblock %}
+{% block content %}
+<h3 class="mb-3">航班搜索结果</h3>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">{{ form.depart_city }}</div>
+    <div class="col-md-3">{{ form.arrive_city }}</div>
+    <div class="col-md-3">{{ form.depart_date }}</div>
+    <div class="col-md-2">{{ form.sort }}</div>
+    <div class="col-md-1">
+        <button class="btn btn-primary w-100">搜索</button>
+    </div>
+</form>
+
+{% if searched and flights|length == 0 %}
+    <div class="alert alert-warning">
+        当前条件下暂无可用航班，请尝试更换日期或城市。
+    </div>
+{% endif %}
+
+{% for flight in flights %}
+    <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="card-title">
+                    {{ flight.flight_no }} - {{ flight.airline }}
+                </h5>
+                <p class="card-text mb-1">
+                    {{ flight.depart_airport.city }} ({{ flight.depart_airport.code }})
+                    {{ flight.depart_time|date:"Y-m-d H:i" }}
+                    →
+                    {{ flight.arrive_airport.city }} ({{ flight.arrive_airport.code }})
+                    {{ flight.arrive_time|date:"Y-m-d H:i" }}
+                </p>
+                <small class="text-muted">最低票价：¥{{ flight.min_price }}</small>
+            </div>
+            <div>
+                <a href="{% url 'flights:detail' flight.id %}" class="btn btn-outline-primary">
+                    查看详情
+                </a>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}
