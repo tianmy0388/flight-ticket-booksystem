@@ -175,6 +175,32 @@ def revenue_overview(request):
         or Decimal("0.00")
     )
 
+    # 月度营收分布（用于柱状图）
+    monthly_chart_labels = [f"{m}月" for m in range(1, 13)]
+    monthly_chart_data = []
+    for m in range(1, 13):
+        month_total = (
+            paid_orders.filter(paid_at__year=selected_year, paid_at__month=m)
+            .aggregate(total=Sum("total_amount"))
+            .get("total")
+            or Decimal("0.00")
+        )
+        monthly_chart_data.append(float(month_total))
+
+    # 本周每天营收（用于补充趋势展示）
+    weekly_chart_labels = []
+    weekly_chart_data = []
+    for i in range(7):
+        current_day = week_start + timedelta(days=i)
+        weekly_chart_labels.append(current_day.strftime("%m-%d"))
+        daily_total = (
+            paid_orders.filter(paid_at__date=current_day)
+            .aggregate(total=Sum("total_amount"))
+            .get("total")
+            or Decimal("0.00")
+        )
+        weekly_chart_data.append(float(daily_total))
+
     return render(
         request,
         "dashboard/revenue_overview.html",
@@ -186,6 +212,10 @@ def revenue_overview(request):
             "yearly_total": yearly_total,
             "monthly_total": monthly_total,
             "weekly_total": weekly_total,
+            "monthly_chart_labels": monthly_chart_labels,
+            "monthly_chart_data": monthly_chart_data,
+            "weekly_chart_labels": weekly_chart_labels,
+            "weekly_chart_data": weekly_chart_data,
         },
     )
 

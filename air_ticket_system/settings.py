@@ -190,7 +190,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "airticket_db",
         "USER": "postgres",
-        "PASSWORD": "0000",
+        "PASSWORD": "110",
         "HOST": "localhost",
         "PORT": "5432",
     }
