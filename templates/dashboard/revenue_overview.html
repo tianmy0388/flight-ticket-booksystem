@@ -54,6 +54,8 @@
                     <span class="hint-badge">{{ selected_year }} 年</span>
                 </div>
                 <form method="get" class="row g-2">
+                    <input type="hidden" name="month" value="{{ selected_month }}">
+                    <input type="hidden" name="week_start" value="{{ selected_week_start }}">
                     <div class="col-7">
                         <label class="form-label" for="id_year">选择年份</label>
                         <input type="number" class="form-control" id="id_year" name="year" value="{{ selected_year }}">
@@ -78,6 +80,8 @@
                     <span class="hint-badge">{{ selected_month }}</span>
                 </div>
                 <form method="get" class="row g-2">
+                    <input type="hidden" name="year" value="{{ selected_year }}">
+                    <input type="hidden" name="week_start" value="{{ selected_week_start }}">
                     <div class="col-7">
                         <label class="form-label" for="id_month">选择月份</label>
                         <input type="month" class="form-control" id="id_month" name="month" value="{{ selected_month }}">
@@ -102,6 +106,8 @@
                     <span class="badge bg-light text-primary">{{ selected_week_start }} ~ {{ week_end|date:"Y-%m-%d" }}</span>
                 </div>
                 <form method="get" class="row g-2">
+                    <input type="hidden" name="year" value="{{ selected_year }}">
+                    <input type="hidden" name="month" value="{{ selected_month }}">
                     <div class="col-7">
                         <label class="form-label text-white-50" for="id_week_start">周起始日</label>
                         <input type="date" class="form-control" id="id_week_start" name="week_start" value="{{ selected_week_start }}">
