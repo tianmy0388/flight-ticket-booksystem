@@ -23,8 +23,16 @@ class FlightSearchForm(forms.Form):
     )
     depart_date = forms.DateField(
         label="出发日期",
+        input_formats=["%Y-%m-%d"],
         widget=forms.DateInput(
-            attrs={"type": "date", "class": "form-control", "placeholder": "yyyy/mm/dd"}
+            format="%Y-%m-%d",
+            attrs={
+                "type": "text",
+                "class": "form-control",
+                "placeholder": "yyyy/mm/dd",
+                "onfocus": "this.type='date'",
+                "onblur": "if(!this.value)this.type='text'",
+            },
         ),
     )
     sort = forms.ChoiceField(

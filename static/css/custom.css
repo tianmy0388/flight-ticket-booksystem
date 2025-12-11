@@ -104,11 +104,11 @@ body.app-body::after {
     pointer-events: none;
     mix-blend-mode: screen;
     z-index: 0;
-    opacity: 0.9;
+    opacity: 0.85;
     background: radial-gradient(
-        520px at var(--mx, 50%) var(--my, 50%),
-        rgba(255, 255, 255, 0.28),
-        rgba(255, 255, 255, 0) 70%
+        420px at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.26),
+        rgba(255, 255, 255, 0) 62%
     );
     transition: background-position 120ms ease, opacity 200ms ease;
 }
