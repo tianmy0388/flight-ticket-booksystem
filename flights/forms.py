@@ -23,7 +23,9 @@ class FlightSearchForm(forms.Form):
     )
     depart_date = forms.DateField(
         label="出发日期",
-        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        widget=forms.DateInput(
+            attrs={"type": "date", "class": "form-control", "placeholder": "yyyy/mm/dd"}
+        ),
     )
     sort = forms.ChoiceField(
         label="排序方式",

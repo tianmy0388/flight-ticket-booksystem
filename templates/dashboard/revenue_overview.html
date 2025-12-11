@@ -32,12 +32,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 text-white">
     <div>
-        <p class="text-uppercase text-muted mb-1 small">运营仪表盘</p>
-        <h3 class="fw-bold mb-0">营收统计与趋势</h3>
+        <p class="text-uppercase text-white-50 mb-1 small">运营仪表盘</p>
+        <h3 class="fw-bold mb-0 text-white">营收统计与趋势</h3>
     </div>
-    <div class="stat-chip mt-2 mt-md-0">
+    <div class="stat-chip mt-2 mt-md-0 bg-light text-primary">
         <i class="bi bi-activity me-1"></i> 数据实时汇总展示
     </div>
 </div>
@@ -103,7 +103,7 @@
                         <p class="text-light text-opacity-75 mb-1">周度营收</p>
                         <h4 class="fw-bold text-white">¥{{ weekly_total|default:"0.00" }}</h4>
                     </div>
-                    <span class="badge bg-light text-primary">{{ selected_week_start }} ~ {{ week_end|date:"Y-%m-%d" }}</span>
+                    <span class="badge bg-light text-primary">{{ selected_week_start }} ~ {{ week_end|date:"Y-m-d" }}</span>
                 </div>
                 <form method="get" class="row g-2">
                     <input type="hidden" name="year" value="{{ selected_year }}">

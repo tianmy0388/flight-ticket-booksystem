@@ -1,34 +1,48 @@
 {% extends "base.html" %}
 {% block title %}我的订单{% endblock %}
 {% block content %}
-<h3>我的订单</h3>
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th>订单号</th>
-        <th>航班</th>
-        <th>出发时间</th>
-        <th>金额</th>
-        <th>状态</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for o in orders %}
-        <tr>
-            <td>{{ o.order_no }}</td>
-            <td>{{ o.flight.flight_no }}</td>
-            <td>{{ o.flight.depart_time|date:"Y-m-d H:i" }}</td>
-            <td>¥{{ o.total_amount }}</td>
-            <td>{{ o.get_status_display }}</td>
-            <td>
-                <a href="{% url 'orders:order_detail' o.order_no %}"
-                   class="btn btn-sm btn-outline-primary">详情</a>
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="6">暂无订单</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="card glass-card soft-shadow border-0 mb-4">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <p class="text-subtle mb-1">订单中心</p>
+                <h4 class="fw-bold mb-0">我的订单</h4>
+            </div>
+            <span class="badge-soft">共 {{ orders|length }} 笔记录</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>航班</th>
+                    <th>出发时间</th>
+                    <th>金额</th>
+                    <th>状态</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for o in orders %}
+                    <tr>
+                        <td class="fw-semibold">{{ o.order_no }}</td>
+                        <td>
+                            <div class="fw-semibold">{{ o.flight.flight_no }}</div>
+                            <div class="text-subtle small">{{ o.flight.depart_airport.city }} &rarr; {{ o.flight.arrive_airport.city }}</div>
+                        </td>
+                        <td>{{ o.flight.depart_time|date:"Y-m-d H:i" }}</td>
+                        <td class="fw-bold">¥{{ o.total_amount }}</td>
+                        <td><span class="status-pill">{{ o.get_status_display }}</span></td>
+                        <td class="text-end">
+                            <a href="{% url 'orders:order_detail' o.order_no %}" class="btn btn-sm btn-outline-primary">详情</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" class="text-center text-subtle py-4">暂时没有订单，去搜索航班开始出行吧。</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
