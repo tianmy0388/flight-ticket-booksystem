@@ -1,14 +1,27 @@
 {% extends "base.html" %}
 {% block title %}个人信息{% endblock %}
 {% block content %}
-<h3>个人信息</h3>
-<div class="row">
-    <div class="col-md-6">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn btn-primary">保存</button>
-        </form>
+<div class="card glass-card soft-shadow border-0">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <p class="text-subtle mb-1">账户中心</p>
+                <h4 class="fw-bold mb-0">个人信息</h4>
+            </div>
+            <span class="badge-soft">完善资料以便快速出行</span>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary">保存</button>
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary">返回首页</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

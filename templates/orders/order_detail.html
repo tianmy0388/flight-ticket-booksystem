@@ -1,22 +1,48 @@
 {% extends "base.html" %}
 {% block title %}订单详情{% endblock %}
 {% block content %}
-<h3>订单详情</h3>
-<div class="card mb-3">
+<div class="card glass-card soft-shadow border-0 mb-4">
     <div class="card-body">
-        <p>订单号：{{ order.order_no }}</p>
-        <p>乘机人：{{ order.profile.real_name }} / {{ order.profile.id_card_no }}</p>
-        <p>航班：{{ order.flight.flight_no }} - {{ order.flight.airline }}</p>
-        <p>起飞时间：{{ order.flight.depart_time|date:"Y-m-d H:i" }}</p>
-        <p>舱位：{{ order.seat.get_cabin_class_display }}</p>
-        <p>票价：¥{{ order.ticket_price }}，税费：¥{{ order.tax }}，手续费：¥{{ order.fee }}</p>
-        <p>总金额：¥{{ order.total_amount }}</p>
-        <p>状态：{{ order.get_status_display }}</p>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <p class="text-subtle mb-1">订单详情</p>
+                <h4 class="fw-bold mb-0">订单号：{{ order.order_no }}</h4>
+            </div>
+            <span class="status-pill">{{ order.get_status_display }}</span>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="stat-pill shadow-sm h-100">
+                    <div class="fw-semibold mb-2"><i class="bi bi-airplane me-1"></i>航班信息</div>
+                    <div class="text-subtle small">航班：{{ order.flight.flight_no }} · {{ order.flight.airline }}</div>
+                    <div class="text-subtle small">出发：{{ order.flight.depart_airport.city }} {{ order.flight.depart_airport.name }} ({{ order.flight.depart_airport.code }})</div>
+                    <div class="text-subtle small">到达：{{ order.flight.arrive_airport.city }} {{ order.flight.arrive_airport.name }} ({{ order.flight.arrive_airport.code }})</div>
+                    <div class="text-subtle small">起飞时间：{{ order.flight.depart_time|date:"Y-m-d H:i" }}</div>
+                    <div class="text-subtle small">舱位：{{ order.seat.get_cabin_class_display }}</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="stat-pill shadow-sm h-100">
+                    <div class="fw-semibold mb-2"><i class="bi bi-person-badge me-1"></i>乘机人</div>
+                    <div class="text-subtle small">姓名：{{ order.profile.real_name }}</div>
+                    <div class="text-subtle small">证件号：{{ order.profile.id_card_no }}</div>
+                    <hr class="text-subtle">
+                    <div class="fw-semibold mb-2"><i class="bi bi-wallet me-1"></i>费用明细</div>
+                    <div class="text-subtle small">票价：¥{{ order.ticket_price }}</div>
+                    <div class="text-subtle small">税费：¥{{ order.tax }}</div>
+                    <div class="text-subtle small">手续费：¥{{ order.fee }}</div>
+                    <div class="fw-bold mt-2">总金额：¥{{ order.total_amount }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if order.status == "PAID" %}
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'orders:refund_request' order.order_no %}"
+                   class="btn btn-danger">申请退票</a>
+            </div>
+        {% endif %}
     </div>
 </div>
-
-{% if order.status == "PAID" %}
-    <a href="{% url 'orders:refund_request' order.order_no %}"
-       class="btn btn-danger">申请退票</a>
-{% endif %}
 {% endblock %}

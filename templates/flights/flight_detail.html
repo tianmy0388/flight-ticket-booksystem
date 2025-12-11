@@ -1,52 +1,76 @@
 {% extends "base.html" %}
 {% block title %}航班详情 - {{ flight.flight_no }}{% endblock %}
 {% block content %}
-<h3>航班详情</h3>
-<div class="card mb-3">
+<div class="card glass-card soft-shadow border-0 mb-4">
     <div class="card-body">
-        <h5 class="card-title">{{ flight.flight_no }} - {{ flight.airline }}</h5>
-        <p>机型：{{ flight.plane_type }}</p>
-        <p>
-            起飞：{{ flight.depart_airport.city }} {{ flight.depart_airport.name }}
-            ({{ flight.depart_airport.code }})<br>
-            时间：{{ flight.depart_time|date:"Y-m-d H:i" }}
-        </p>
-        <p>
-            到达：{{ flight.arrive_airport.city }} {{ flight.arrive_airport.name }}
-            ({{ flight.arrive_airport.code }})<br>
-            时间：{{ flight.arrive_time|date:"Y-m-d H:i" }}
-        </p>
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div>
+                <p class="text-subtle mb-1">航班详情</p>
+                <h4 class="fw-bold mb-2">{{ flight.flight_no }} · {{ flight.airline }}</h4>
+                <div class="d-flex flex-wrap gap-3 flight-meta">
+                    <span><i class="bi bi-airplane me-1"></i>机型：{{ flight.plane_type }}</span>
+                    <span><i class="bi bi-geo-alt me-1"></i>{{ flight.depart_airport.city }} &rarr; {{ flight.arrive_airport.city }}</span>
+                </div>
+            </div>
+            <span class="badge-soft"><i class="bi bi-clock-history me-1"></i>实时票价</span>
+        </div>
+
+        <div class="row g-4 mt-3">
+            <div class="col-md-6">
+                <div class="stat-pill shadow-sm h-100">
+                    <div class="text-subtle small mb-1">起飞</div>
+                    <div class="fw-bold fs-5 mb-1">{{ flight.depart_time|date:"Y-m-d H:i" }}</div>
+                    <div class="text-subtle">{{ flight.depart_airport.city }} {{ flight.depart_airport.name }} ({{ flight.depart_airport.code }})</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-pill shadow-sm h-100">
+                    <div class="text-subtle small mb-1">到达</div>
+                    <div class="fw-bold fs-5 mb-1">{{ flight.arrive_time|date:"Y-m-d H:i" }}</div>
+                    <div class="text-subtle">{{ flight.arrive_airport.city }} {{ flight.arrive_airport.name }} ({{ flight.arrive_airport.code }})</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<h4>舱位与价格</h4>
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th>舱位</th>
-        <th>价格</th>
-        <th>余票</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for s in seats %}
-        <tr>
-            <td>{{ s.get_cabin_class_display }}</td>
-            <td>¥{{ s.price }}</td>
-            <td>{{ s.available_seats }}</td>
-            <td>
-                {% if user.is_authenticated and s.available_seats > 0 %}
-                    <a href="{% url 'orders:create_order' flight.id s.id %}"
-                       class="btn btn-sm btn-primary">预订</a>
-                {% elif s.available_seats <= 0 %}
-                    <span class="text-muted">已售罄</span>
-                {% else %}
-                    <a href="{% url 'accounts:login' %}?next={{ request.path }}">登录后预订</a>
-                {% endif %}
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="card glass-card soft-shadow border-0">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">舱位与票价</h5>
+            <span class="text-subtle small">选择心仪座位后即可下单</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>舱位</th>
+                    <th>价格</th>
+                    <th>余票</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in seats %}
+                    <tr>
+                        <td class="fw-semibold">{{ s.get_cabin_class_display }}</td>
+                        <td class="price-tag">¥{{ s.price }}</td>
+                        <td>{{ s.available_seats }}</td>
+                        <td class="text-end">
+                            {% if user.is_authenticated and s.available_seats > 0 %}
+                                <a href="{% url 'orders:create_order' flight.id s.id %}"
+                                   class="btn btn-sm btn-primary">预订</a>
+                            {% elif s.available_seats <= 0 %}
+                                <span class="text-subtle">已售罄</span>
+                            {% else %}
+                                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary">登录后预订</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

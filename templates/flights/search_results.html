@@ -1,41 +1,72 @@
 {% extends "base.html" %}
 {% block title %}搜索结果 - 机票预订系统{% endblock %}
 {% block content %}
-<h3 class="mb-3">航班搜索结果</h3>
-
-<form method="get" class="row g-2 mb-3">
-    <div class="col-md-3">{{ form.depart_city }}</div>
-    <div class="col-md-3">{{ form.arrive_city }}</div>
-    <div class="col-md-3">{{ form.depart_date }}</div>
-    <div class="col-md-2">{{ form.sort }}</div>
-    <div class="col-md-1">
-        <button class="btn btn-primary w-100">搜索</button>
+<div class="card glass-card soft-shadow border-0 mb-4">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <div>
+                <p class="text-subtle mb-1">航班搜索</p>
+                <h5 class="fw-bold mb-0">快速筛选与排序</h5>
+            </div>
+            <span class="badge-soft">已为你匹配 {{ flights|length }} 个航班</span>
+        </div>
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">出发城市</label>
+                {{ form.depart_city }}
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">到达城市</label>
+                {{ form.arrive_city }}
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">出发日期</label>
+                {{ form.depart_date }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">排序方式</label>
+                {{ form.sort }}
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-primary w-100">搜索</button>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 {% if searched and flights|length == 0 %}
-    <div class="alert alert-warning">
+    <div class="alert alert-warning shadow-sm">
         当前条件下暂无可用航班，请尝试更换日期或城市。
     </div>
 {% endif %}
 
 {% for flight in flights %}
-    <div class="card mb-3">
-        <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-                <h5 class="card-title">
-                    {{ flight.flight_no }} - {{ flight.airline }}
-                </h5>
-                <p class="card-text mb-1">
-                    {{ flight.depart_airport.city }} ({{ flight.depart_airport.code }})
-                    {{ flight.depart_time|date:"Y-m-d H:i" }}
-                    →
-                    {{ flight.arrive_airport.city }} ({{ flight.arrive_airport.code }})
-                    {{ flight.arrive_time|date:"Y-m-d H:i" }}
-                </p>
-                <small class="text-muted">最低票价：¥{{ flight.min_price }}</small>
+    <div class="flight-card p-3 p-md-4 mb-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+            <div class="flex-grow-1">
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+                    <div class="fw-bold fs-5">{{ flight.depart_airport.city }} 到 {{ flight.arrive_airport.city }}</div>
+                    <span class="badge-soft"><i class="bi bi-building me-1"></i>{{ flight.airline }}</span>
+                    <span class="text-subtle">{{ flight.flight_no }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-4 flex-wrap flight-meta">
+                    <div>
+                        <div class="fw-bold fs-5">{{ flight.depart_time|date:"H:i" }}</div>
+                        <small class="text-subtle">{{ flight.depart_airport.code }} · {{ flight.depart_time|date:"Y-m-d" }}</small>
+                    </div>
+                    <div class="text-subtle"><i class="bi bi-arrow-right"></i></div>
+                    <div>
+                        <div class="fw-bold fs-5">{{ flight.arrive_time|date:"H:i" }}</div>
+                        <small class="text-subtle">{{ flight.arrive_airport.code }} · {{ flight.arrive_time|date:"Y-m-d" }}</small>
+                    </div>
+                </div>
+                <div class="flight-meta mt-2">
+                    <i class="bi bi-geo-alt me-1"></i>{{ flight.depart_airport.name }} &rarr; {{ flight.arrive_airport.name }}
+                </div>
             </div>
-            <div>
+            <div class="text-end align-self-center">
+                <div class="text-subtle small mb-1">最低票价</div>
+                <div class="price-tag mb-2">¥{{ flight.min_price }}</div>
                 <a href="{% url 'flights:detail' flight.id %}" class="btn btn-outline-primary">
                     查看详情
                 </a>

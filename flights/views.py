@@ -7,8 +7,7 @@ from .forms import FlightSearchForm
 
 
 def home(request):
-    form = FlightSearchForm()
-    return render(request, "home.html", {"form": form})
+    return render(request, "welcome.html")
 
 
 def flight_search(request):
