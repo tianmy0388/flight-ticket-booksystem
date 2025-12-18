@@ -1,9 +1,23 @@
 # flights/views.py
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Min, Q
+from django.utils import timezone
+from datetime import timedelta
 
 from .models import Flight, FlightSeat, FlightStatus
 from .forms import FlightSearchForm
+
+
+def _expire_flights():
+    """
+    将起飞时间在 1 小时内的在售航班标记为已结束，避免继续售票。
+    """
+    now = timezone.now()
+    cutoff = now + timedelta(hours=1)
+    Flight.objects.filter(
+        status=FlightStatus.ON_SALE,
+        depart_time__lte=cutoff,
+    ).update(status=FlightStatus.FINISHED)
 
 
 def home(request):
@@ -11,6 +25,9 @@ def home(request):
 
 
 def flight_search(request):
+    # 先刷新即将起飞的航班状态，起飞前 1 小时内不再售票
+    _expire_flights()
+
     form = FlightSearchForm(request.GET or None)
     flights = []
     searched = False
@@ -43,6 +60,7 @@ def flight_search(request):
             Flight.objects.filter(
                 filters,
                 depart_time__date=depart_date,
+                depart_time__gt=timezone.now() + timedelta(hours=1),
                 status=FlightStatus.ON_SALE,
                 seats__available_seats__gt=0,
             )
@@ -65,6 +83,7 @@ def flight_search(request):
 
 
 def flight_detail(request, pk):
+    _expire_flights()
     flight = get_object_or_404(Flight, pk=pk)
     seats = FlightSeat.objects.filter(flight=flight).order_by("price")
     return render(

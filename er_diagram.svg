@@ -1,0 +1,86 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" style="font-family:Arial, sans-serif; font-size:12px; background:#0f172a;">
+  <style>
+    .entity { fill:#0b2447; stroke:#3b82f6; stroke-width:1.5; rx:8; ry:8; }
+    .entity-title { fill:#e2e8f0; font-weight:bold; font-size:14px; }
+    .field { fill:#cbd5e1; font-size:12px; }
+    .fk { fill:#a5b4fc; font-style:italic; }
+    .line { stroke:#94a3b8; stroke-width:1.4; marker-end:url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L6,3 z" fill="#94a3b8" />
+    </marker>
+  </defs>
+
+  <!-- auth_user -->
+  <rect class="entity" x="40" y="60" width="200" height="120" />
+  <text class="entity-title" x="60" y="82">auth_user</text>
+  <text class="field" x="60" y="102">id (PK)</text>
+  <text class="field" x="60" y="118">username, email, password</text>
+  <text class="field" x="60" y="134">is_staff, ...</text>
+
+  <!-- PassengerProfile -->
+  <rect class="entity" x="320" y="60" width="240" height="140" />
+  <text class="entity-title" x="340" y="82">accounts_passengerprofile</text>
+  <text class="field" x="340" y="102">id (PK)</text>
+  <text class="fk" x="340" y="118">user_id (FK->auth_user)</text>
+  <text class="field" x="340" y="134">real_name, id_card_no (unique)</text>
+  <text class="field" x="340" y="150">phone, email</text>
+
+  <!-- Airport -->
+  <rect class="entity" x="40" y="260" width="220" height="130" />
+  <text class="entity-title" x="60" y="282">flights_airport</text>
+  <text class="field" x="60" y="302">id (PK)</text>
+  <text class="field" x="60" y="318">code (unique)</text>
+  <text class="field" x="60" y="334">name, city, country</text>
+
+  <!-- Flight -->
+  <rect class="entity" x="320" y="260" width="260" height="170" />
+  <text class="entity-title" x="340" y="282">flights_flight</text>
+  <text class="field" x="340" y="302">id (PK)</text>
+  <text class="fk" x="340" y="318">depart_airport_id (FK->airport)</text>
+  <text class="fk" x="340" y="334">arrive_airport_id (FK->airport)</text>
+  <text class="field" x="340" y="350">flight_no, airline, plane_type</text>
+  <text class="field" x="340" y="366">depart_time, arrive_time</text>
+  <text class="field" x="340" y="382">base_price, status</text>
+
+  <!-- FlightSeat -->
+  <rect class="entity" x="660" y="260" width="230" height="150" />
+  <text class="entity-title" x="680" y="282">flights_flightseat</text>
+  <text class="field" x="680" y="302">id (PK)</text>
+  <text class="fk" x="680" y="318">flight_id (FK->flight)</text>
+  <text class="field" x="680" y="334">cabin_class (unique w/flight)</text>
+  <text class="field" x="680" y="350">total_seats, available_seats</text>
+  <text class="field" x="680" y="366">price</text>
+
+  <!-- TicketOrder -->
+  <rect class="entity" x="320" y="500" width="320" height="200" />
+  <text class="entity-title" x="340" y="522">orders_ticketorder</text>
+  <text class="field" x="340" y="542">id (PK), order_no (unique)</text>
+  <text class="fk" x="340" y="558">user_id (FK->auth_user)</text>
+  <text class="fk" x="340" y="574">profile_id (FK->passengerprofile)</text>
+  <text class="fk" x="340" y="590">flight_id (FK->flight)</text>
+  <text class="fk" x="340" y="606">seat_id (FK->flightseat)</text>
+  <text class="field" x="340" y="622">status, ticket_price, tax, fee</text>
+  <text class="field" x="340" y="638">total_amount</text>
+  <text class="field" x="340" y="654">created_at, paid_at, ...</text>
+
+  <!-- RefundRecord -->
+  <rect class="entity" x="700" y="520" width="230" height="140" />
+  <text class="entity-title" x="720" y="542">orders_refundrecord</text>
+  <text class="field" x="720" y="562">id (PK)</text>
+  <text class="fk" x="720" y="578">order_id (1:1 FK->ticketorder)</text>
+  <text class="field" x="720" y="594">status, refund_amount, refund_fee</text>
+  <text class="field" x="720" y="610">reason, request_time, approve_time</text>
+
+  <!-- Relationships -->
+  <line class="line" x1="240" y1="120" x2="320" y2="120" />
+  <line class="line" x1="150" y1="325" x2="320" y2="310" />
+  <line class="line" x1="150" y1="325" x2="320" y2="340" />
+  <line class="line" x1="580" y1="340" x2="660" y2="340" />
+  <line class="line" x1="480" y1="540" x2="480" y2="430" />
+  <line class="line" x1="370" y1="560" x2="140" y2="140" />
+  <line class="line" x1="420" y1="580" x2="420" y2="200" />
+  <line class="line" x1="540" y1="600" x2="750" y2="370" />
+  <line class="line" x1="640" y1="590" x2="700" y2="590" />
+</svg>

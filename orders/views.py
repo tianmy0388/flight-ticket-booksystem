@@ -3,12 +3,14 @@
 # # Create your views here.
 import uuid
 from decimal import Decimal
+from datetime import timedelta
 
 from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.http import Http404
+from django.http import Http404, HttpResponseNotAllowed
+from django.db.models import Q
 
 from flights.models import Flight, FlightSeat
 from accounts.models import PassengerProfile
@@ -38,6 +40,7 @@ def _calc_refund_fee(order: TicketOrder):
     elif hours > 0:
         rate = Decimal("0.20")
     else:
+        # 起飞后不允许退票
         raise ValueError("航班已起飞，无法退票")
 
     fee = (price * rate).quantize(Decimal("0.01"))
@@ -45,15 +48,56 @@ def _calc_refund_fee(order: TicketOrder):
     return fee, refund_amount
 
 
+def _refresh_order_status(order: TicketOrder) -> TicketOrder:
+    """
+    自动处理未支付订单的过期状态，并补充支付截止时间/倒计时信息。
+    """
+    if order.status == OrderStatus.RESERVED:
+        deadline = order.created_at + timedelta(minutes=15)
+        now = timezone.now()
+        if now >= deadline:
+            order.status = OrderStatus.CANCELLED
+            order.cancelled_at = now
+            order.save(update_fields=["status", "cancelled_at"])
+            # 归还座位
+            seat = order.seat
+            seat.available_seats += 1
+            seat.save(update_fields=["available_seats"])
+        else:
+            order.payment_deadline = deadline
+            order.remaining_seconds = int((deadline - now).total_seconds())
+    return order
+
+
 @login_required
 def create_order(request, flight_id, seat_id):
     flight = get_object_or_404(Flight, pk=flight_id)
     seat = get_object_or_404(FlightSeat, pk=seat_id, flight=flight)
 
+    # 管理员账号不参与购票，给出友好提示
+    if request.user.is_staff:
+        return render(
+            request,
+            "orders/order_error.html",
+            {"message": "管理员账号仅用于后台管理，不支持在线购票。请使用乘客账号下单。"},
+        )
+
     profile: PassengerProfile = request.user.profile
 
     if flight.status != "ON_SALE":
         raise Http404("航班不可售")
+
+    # 同一用户同一航班不得重复预订/支付（仅排除已取消或已退票的订单）
+    existing = TicketOrder.objects.filter(
+        user=request.user,
+        flight=flight,
+    ).exclude(status__in=[OrderStatus.CANCELLED, OrderStatus.REFUNDED])
+    if existing.exists():
+        return render(
+            request,
+            "orders/order_error.html",
+            {"message": "您已对该航班有预订或已支付订单，请勿重复下单。可在“我的订单”查看进度。"},
+        )
 
     if request.method == "POST":
         with transaction.atomic():
@@ -82,11 +126,10 @@ def create_order(request, flight_id, seat_id):
                 profile=profile,
                 flight=flight,
                 seat=seat_for_update,
-                status=OrderStatus.PAID,
+                status=OrderStatus.RESERVED,
                 ticket_price=ticket_price,
                 tax=tax,
                 total_amount=total_amount,
-                paid_at=timezone.now(),
             )
 
         return redirect("orders:order_detail", order_no=order.order_no)
@@ -101,11 +144,12 @@ def create_order(request, flight_id, seat_id):
 
 @login_required
 def order_list(request):
-    orders = (
+    orders_qs = (
         TicketOrder.objects.filter(user=request.user)
         .select_related("flight", "seat")
         .order_by("-created_at")
     )
+    orders = [_refresh_order_status(o) for o in orders_qs]
     return render(request, "orders/order_list.html", {"orders": orders})
 
 
@@ -116,6 +160,7 @@ def order_detail(request, order_no):
         order_no=order_no,
         user=request.user,
     )
+    order = _refresh_order_status(order)
     return render(request, "orders/order_detail.html", {"order": order})
 
 
@@ -177,3 +222,29 @@ def refund_request(request, order_no):
             "form": form,
         },
     )
+
+
+@login_required
+def pay_order(request, order_no):
+    order = get_object_or_404(
+        TicketOrder.objects.select_related("flight", "seat"),
+        order_no=order_no,
+        user=request.user,
+    )
+    order = _refresh_order_status(order)
+    if order.status == OrderStatus.CANCELLED:
+        return render(
+            request,
+            "orders/order_error.html",
+            {"message": "超过支付时限，订单已取消"},
+        )
+    if order.status != OrderStatus.RESERVED:
+        return redirect("orders:order_detail", order_no=order.order_no)
+
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    order.status = OrderStatus.PAID
+    order.paid_at = timezone.now()
+    order.save(update_fields=["status", "paid_at"])
+    return redirect("orders:order_detail", order_no=order.order_no)

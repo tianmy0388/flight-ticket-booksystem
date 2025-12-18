@@ -42,7 +42,46 @@
                 <a href="{% url 'orders:refund_request' order.order_no %}"
                    class="btn btn-danger">申请退票</a>
             </div>
+        {% elif order.status == "RESERVED" %}
+            <div class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center mt-4">
+                <div>
+                    请在 <span id="countdown" data-seconds="{{ order.remaining_seconds|default:0 }}"></span> 内完成支付，超时订单将自动取消。
+                </div>
+                <form method="post" action="{% url 'orders:pay_order' order.order_no %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary btn-sm ms-2" type="submit">立即支付</button>
+                </form>
+            </div>
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if order.status == "RESERVED" %}
+<script>
+    (() => {
+        const el = document.getElementById('countdown');
+        if (!el) return;
+        let remaining = parseInt(el.dataset.seconds || "0", 10);
+        const fmt = (s) => {
+            if (s < 0) s = 0;
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        };
+        const tick = () => {
+            el.textContent = fmt(remaining);
+            if (remaining <= 0) {
+                clearInterval(timer);
+                el.closest('.alert').classList.add('text-muted');
+                return;
+            }
+            remaining -= 1;
+        };
+        const timer = setInterval(tick, 1000);
+        tick();
+    })();
+</script>
+{% endif %}
 {% endblock %}

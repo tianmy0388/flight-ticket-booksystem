@@ -16,9 +16,12 @@ urlpatterns = [
         name="create_order",
     ),
 
-    # 订单详情：/orders/<order_no>/
-    path("<str:order_no>/", views.order_detail, name="order_detail"),
+    # 支付订单：/orders/<order_no>/pay/
+    path("<str:order_no>/pay/", views.pay_order, name="pay_order"),
 
     # 退票：/orders/<order_no>/refund/
     path("<str:order_no>/refund/", views.refund_request, name="refund_request"),
+
+    # 订单详情：/orders/<order_no>/
+    path("<str:order_no>/", views.order_detail, name="order_detail"),
 ]

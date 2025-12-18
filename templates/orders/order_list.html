@@ -34,7 +34,16 @@
                         <td class="fw-bold">¥{{ o.total_amount }}</td>
                         <td><span class="status-pill">{{ o.get_status_display }}</span></td>
                         <td class="text-end">
-                            <a href="{% url 'orders:order_detail' o.order_no %}" class="btn btn-sm btn-outline-primary">详情</a>
+                            {% if o.status == "RESERVED" %}
+                                <div class="text-subtle small mb-1">
+                                    支付剩余：<span class="countdown" data-seconds="{{ o.remaining_seconds|default:0 }}"></span>
+                                </div>
+                                <form method="post" action="{% url 'orders:pay_order' o.order_no %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-primary">立即支付</button>
+                                </form>
+                            {% endif %}
+                            <a href="{% url 'orders:order_detail' o.order_no %}" class="btn btn-sm btn-outline-primary mt-1">详情</a>
                         </td>
                     </tr>
                 {% empty %}
@@ -45,4 +54,27 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (() => {
+        const els = document.querySelectorAll('.countdown');
+        if (!els.length) return;
+        const tick = () => {
+            els.forEach((el) => {
+                let s = parseInt(el.dataset.seconds || "0", 10);
+                if (s < 0) s = 0;
+                const m = Math.floor(s / 60);
+                const sec = s % 60;
+                el.textContent = `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+                if (s > 0) {
+                    el.dataset.seconds = s - 1;
+                }
+            });
+        };
+        tick();
+        setInterval(tick, 1000);
+    })();
+</script>
 {% endblock %}

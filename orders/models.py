@@ -10,6 +10,7 @@ from flights.models import Flight, FlightSeat
 
 
 class OrderStatus(models.TextChoices):
+    RESERVED = "RESERVED", "已预订"
     PAID = "PAID", "已支付"
     CANCELLED = "CANCELLED", "已取消"
     REFUNDING = "REFUNDING", "退票中"
@@ -30,7 +31,7 @@ class TicketOrder(models.Model):
     )
 
     status = models.CharField(
-        max_length=20, choices=OrderStatus.choices, default=OrderStatus.PAID
+        max_length=20, choices=OrderStatus.choices, default=OrderStatus.RESERVED
     )
 
     ticket_price = models.DecimalField(max_digits=10, decimal_places=2)

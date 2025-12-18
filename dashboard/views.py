@@ -14,7 +14,7 @@ from django.db.models.deletion import ProtectedError
 from django.utils import timezone
 
 from orders.models import TicketOrder, OrderStatus
-from flights.models import Flight, FlightSeat, CabinClass
+from flights.models import Flight, FlightSeat, CabinClass, FlightStatus
 from flights.forms import FlightAdminForm
 
 
@@ -148,42 +148,47 @@ def revenue_overview(request):
     week_end = week_start + timedelta(days=7)
 
     paid_orders = TicketOrder.objects.filter(status=OrderStatus.PAID)
+    refunded_orders = TicketOrder.objects.filter(status=OrderStatus.REFUNDED)
+
+    def _sum_paid(**kwargs):
+        return (
+            paid_orders.filter(**kwargs)
+            .aggregate(total=Sum("total_amount"))
+            .get("total")
+            or Decimal("0.00")
+        )
+
+    def _sum_refund_fee(**kwargs):
+        return (
+            refunded_orders.filter(**kwargs)
+            .aggregate(total=Sum("fee"))
+            .get("total")
+            or Decimal("0.00")
+        )
 
     # 按年合计
-    yearly_total = (
-        paid_orders.filter(paid_at__year=selected_year)
-        .aggregate(total=Sum("total_amount"))
-        .get("total")
-        or Decimal("0.00")
+    yearly_total = _sum_paid(paid_at__year=selected_year) + _sum_refund_fee(
+        refunded_at__year=selected_year
     )
 
     # 按月合计
-    monthly_total = (
-        paid_orders.filter(paid_at__year=month_year, paid_at__month=month_month)
-        .aggregate(total=Sum("total_amount"))
-        .get("total")
-        or Decimal("0.00")
-    )
+    monthly_total = _sum_paid(
+        paid_at__year=month_year, paid_at__month=month_month
+    ) + _sum_refund_fee(refunded_at__year=month_year, refunded_at__month=month_month)
 
     # 按周合计（[week_start, week_end)）
-    weekly_total = (
-        paid_orders.filter(
-            paid_at__date__gte=week_start, paid_at__date__lt=week_end
-        )
-        .aggregate(total=Sum("total_amount"))
-        .get("total")
-        or Decimal("0.00")
+    weekly_total = _sum_paid(
+        paid_at__date__gte=week_start, paid_at__date__lt=week_end
+    ) + _sum_refund_fee(
+        refunded_at__date__gte=week_start, refunded_at__date__lt=week_end
     )
 
     # 月度营收分布（用于柱状图）
     monthly_chart_labels = [f"{m}月" for m in range(1, 13)]
     monthly_chart_data = []
     for m in range(1, 13):
-        month_total = (
-            paid_orders.filter(paid_at__year=selected_year, paid_at__month=m)
-            .aggregate(total=Sum("total_amount"))
-            .get("total")
-            or Decimal("0.00")
+        month_total = _sum_paid(paid_at__year=selected_year, paid_at__month=m) + _sum_refund_fee(
+            refunded_at__year=selected_year, refunded_at__month=m
         )
         monthly_chart_data.append(float(month_total))
 
@@ -193,11 +198,8 @@ def revenue_overview(request):
     for i in range(7):
         current_day = week_start + timedelta(days=i)
         weekly_chart_labels.append(current_day.strftime("%m-%d"))
-        daily_total = (
-            paid_orders.filter(paid_at__date=current_day)
-            .aggregate(total=Sum("total_amount"))
-            .get("total")
-            or Decimal("0.00")
+        daily_total = _sum_paid(paid_at__date=current_day) + _sum_refund_fee(
+            refunded_at__date=current_day
         )
         weekly_chart_data.append(float(daily_total))
 
@@ -228,6 +230,12 @@ def flight_list(request):
     """
     航班列表：管理员在这里查看 / 管理所有航班
     """
+    now = timezone.now()
+    cutoff = now + timedelta(hours=1)
+    Flight.objects.filter(status=FlightStatus.ON_SALE, depart_time__lte=cutoff).update(
+        status=FlightStatus.FINISHED
+    )
+
     flights = (
         Flight.objects.select_related("depart_airport", "arrive_airport")
         .order_by("depart_time")
